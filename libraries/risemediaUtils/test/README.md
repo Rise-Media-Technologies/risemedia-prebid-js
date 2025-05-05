@@ -10,15 +10,22 @@ npm install gulp-cli -g
 
 ## Steps
 1. Run the Auction Service & Backend Test Service Locally
-2. Build the prebid js project with RM Adapter
+2. Perform a git checkout for the branch "dev-testing-rm-adapter"
+3. Build the prebid js project with RM Adapter
 ```bash
 gulp build --modules=risemediatechBidAdapter
 ```
 
-3. Run
+4. Run
 ```bash
 gulp serve
 ```
 
+5. Test HTML Page
+The server will be running on http://localhost:9999
+And the test HTML will be available at the following URL :
 
+http://localhost:9999/libraries/risemediaUtils/test/test.html
+
+6. Open DevTools and check for logs in the console for tracing.
 
