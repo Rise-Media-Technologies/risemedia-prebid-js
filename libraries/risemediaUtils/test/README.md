@@ -29,3 +29,23 @@ http://localhost:9999/libraries/risemediaUtils/test/test.html
 
 6. Open DevTools and check for logs in the console for tracing.
 
+# Unit Testing
+
+1. Run the following command
+```bash
+gulp test
+```
+To run the specific risemedia Bid Adapter Unit Test
+```bash
+gulp test --file "test/spec/modules/risemediatechBidAdapter" --nolint
+```
+
+2. To generate test coverage
+```bash
+gulp test-coverage
+```
+
+3. To view the test coverage
+```bash
+gulp view-coverage
+```
