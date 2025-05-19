@@ -37,7 +37,7 @@ gulp test
 ```
 To run the specific risemedia Bid Adapter Unit Test
 ```bash
-gulp test --file "test/spec/modules/risemediatechBidAdapter" --nolint
+gulp test --file "test/spec/modules/risemediatechBidAdapter_spec.js" --nolint
 ```
 
 2. To generate test coverage
