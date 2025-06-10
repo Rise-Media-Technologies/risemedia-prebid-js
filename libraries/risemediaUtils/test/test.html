@@ -8,43 +8,152 @@
     var pbjs = pbjs || {};
     pbjs.que = pbjs.que || [];
   </script>
+  <style>
+    .ad-container {
+      margin: 15px 0;
+    }
+  </style>
 </head>
 <body>
   <h2>Testing: RisemediatechBidAdapter</h2>
-  <div id="ad-slot" style="width:300px;height:250px;border:1px solid #000"></div>
-  <script>
-    pbjs.que.push(function() {
-      pbjs.setConfig({
-        debug: true
-      });
 
-      var adUnits = [{
-        code: 'ad-slot',
+  <!-- Static Banner (Loaded on Page Load) -->
+  <div class="ad-container">
+    <strong>Static Banner Ad:</strong>
+    <div id="static-banner" style="width:300px;height:250px;border:1px solid #000;">
+    </div>
+  </div>
+
+  <!-- On-Demand Buttons -->
+  <div class="ad-container">
+    <strong>On-Demand Controls:</strong><br>
+    <button onclick="loadAdUnits(['dynamic-banner', 'dynamic-video'])">Get All Ads</button>
+    <button onclick="loadAdUnits(['dynamic-banner'])">Get Banner Ad</button>
+    <button onclick="loadAdUnits(['dynamic-video'])">Get Video Ad</button>
+  </div>
+
+  <!-- Dynamic Banner Ad -->
+  <div class="ad-container">
+    <strong>Dynamic Banner Ad:</strong>
+    <div id="dynamic-banner" style="width:300px;height:250px;border:1px solid #000;"></div>
+  </div>
+
+  <!-- Dynamic Video Ad -->
+  <div class="ad-container">
+    <strong>Dynamic Video Ad:</strong><br>
+    <video id="dynamic-video-player" width="640" height="360" controls style="display:none;"></video>
+  </div>
+
+  <script>
+    const PUBLISHER_ID = '12345';
+    const PLACEMENT_ID = '67890';
+    const BID_FLOOR = 0.01;
+
+    // Static load on page render
+    pbjs.que.push(function () {
+      pbjs.setConfig({ debug: true,cache: {
+      useLocal: true 
+    } });
+
+      const staticBannerAdUnit = {
+        code: 'static-banner',
         mediaTypes: {
           banner: {
-            sizes: [[300, 250]]
+            sizes: [[320, 50]]
           }
         },
         bids: [{
           bidder: 'risemediatech',
-          params: {
-            publisherId: '12345',
-            placementId: '67890',
-            bidfloor: 0.01
-          }
+          params: { publisherId: PUBLISHER_ID, placementId: PLACEMENT_ID, bidfloor: BID_FLOOR, mimes: ['image/jpeg', 'image/png'] }
         }]
-      }];
+      };
 
-      pbjs.addAdUnits(adUnits);
+      pbjs.addAdUnits(staticBannerAdUnit);
 
       pbjs.requestBids({
-        bidsBackHandler: function(bidResponses) {
-          console.log('Bid responses:', bidResponses);
-          var targeting = pbjs.getAdserverTargeting();
-          console.log('Targeting:', targeting);
+        bidsBackHandler: function (responses) {
+          const bid = pbjs.getHighestCpmBids('static-banner')[0];
+          if (bid?.ad) {
+            document.getElementById('static-banner').innerHTML = bid.ad;
+          }
         }
       });
     });
+
+    // Dynamic ad unit generator
+    function getAdUnit(code) {
+      if (code === 'dynamic-banner') {
+        return {
+          code,
+          mediaTypes: {
+            banner: { sizes: [[320, 50]] }
+          },
+          bids: [{
+            bidder: 'risemediatech',
+            params: { publisherId: PUBLISHER_ID, placementId: PLACEMENT_ID, bidfloor: BID_FLOOR }
+          }]
+        };
+      } else if (code === 'dynamic-video') {
+        return {
+          code,
+          mediaTypes: {
+            video: {
+              playerSize: [640, 360],
+              mimes: ['video/mp4'],
+              protocols: [2, 3, 5],
+              minduration: 1,
+              maxduration: 30,
+              startdelay: 0,
+              maxseq: 1,
+              poddur: 45
+            }
+          },
+          bids: [{
+            bidder: 'risemediatech',
+            params: { publisherId: PUBLISHER_ID, placementId: PLACEMENT_ID, bidfloor: BID_FLOOR }
+          }]
+        };
+      }
+      return null;
+    }
+
+    // Load on-demand ad units
+    function loadAdUnits(unitCodes = []) {
+      // Clear all previous dynamic content
+      document.getElementById('dynamic-banner').innerHTML = '';
+      const videoPlayer = document.getElementById('dynamic-video-player');
+      videoPlayer.style.display = 'none';
+      videoPlayer.pause();
+      videoPlayer.src = '';
+
+      const adUnits = unitCodes.map(getAdUnit).filter(Boolean);
+
+      pbjs.que.push(function () {
+        // Remove and re-add the relevant ad units only
+        unitCodes.forEach(code => pbjs.removeAdUnit(code));
+        pbjs.addAdUnits(adUnits);
+
+        pbjs.requestBids({
+          adUnitCodes: unitCodes,
+          bidsBackHandler: function (responses) {
+            unitCodes.forEach(code => {
+              const bid = pbjs.getHighestCpmBids(code)[0];
+
+              if (code === 'dynamic-banner' && bid?.ad) {
+                document.getElementById('dynamic-banner').innerHTML = bid.ad;
+              }
+
+              if (code === 'dynamic-video' && bid?.vastUrl) {
+                videoPlayer.src = bid.vastUrl;
+                videoPlayer.style.display = 'block';
+                videoPlayer.load();
+                videoPlayer.play();
+              }
+            });
+          }
+        });
+      });
+    }
   </script>
 </body>
 </html>
