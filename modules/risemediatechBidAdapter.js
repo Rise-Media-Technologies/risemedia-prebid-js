@@ -4,7 +4,7 @@ import { ortbConverter } from '../libraries/ortbConverter/converter.js';
 import { logInfo, logWarn } from '../src/utils.js';
 
 const BIDDER_CODE = 'risemediatech';
-const ENDPOINT_URL = 'https://dev-ads.risemediatech.com/ads/rtb/prebid/js';
+const ENDPOINT_URL = 'http://localhost:8082/ads/rtb/prebid/js';
 const SYNC_URL_IFRAME = 'https://sync.risemediatech.com/iframe';
 const SYNC_URL_IMAGE = 'https://sync.risemediatech.com/image';
 const DEFAULT_CURRENCY = 'USD';
@@ -37,13 +37,13 @@ const converter = ortbConverter({
       logInfo('Adding video media type to impression:', mediaTypes[VIDEO]);
       imp.video = {
         ...mediaTypes[VIDEO],
-        mimes: bidRequest.params.mimes,
-        minduration: bidRequest.params.minduration,
-        maxduration: bidRequest.params.maxduration,
-        startdelay: bidRequest.params.startdelay,
-        maxseq: bidRequest.params.maxseq,
-        poddur: bidRequest.params.poddur,
-        protocols: bidRequest.params.protocols
+        // mimes: bidRequest.params.mimes,
+        // minduration: bidRequest.params.minduration,
+        // maxduration: bidRequest.params.maxduration,
+        // startdelay: bidRequest.params.startdelay,
+        // maxseq: bidRequest.params.maxseq,
+        // poddur: bidRequest.params.poddur,
+        // protocols: bidRequest.params.protocols
       };
     }
 
