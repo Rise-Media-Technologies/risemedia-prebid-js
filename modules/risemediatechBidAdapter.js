@@ -4,7 +4,7 @@ import { ortbConverter } from '../libraries/ortbConverter/converter.js';
 import { logInfo, logWarn } from '../src/utils.js';
 
 const BIDDER_CODE = 'risemediatech';
-const ENDPOINT_URL = 'http://localhost:8082/ads/rtb/prebid/js';
+const ENDPOINT_URL = 'http://54.198.179.1:8082/ads/rtb/prebid/js';
 const SYNC_URL_IFRAME = 'https://sync.risemediatech.com/iframe';
 const SYNC_URL_IMAGE = 'https://sync.risemediatech.com/image';
 const DEFAULT_CURRENCY = 'USD';
