@@ -20,8 +20,7 @@
   <!-- Static Banner (Loaded on Page Load) -->
   <div class="ad-container">
     <strong>Static Banner Ad:</strong>
-    <div id="static-banner" style="width:300px;height:250px;border:1px solid #000;">
-    </div>
+    <div id="static-banner" style="width:300px;height:250px;border:1px solid #000;"></div>
   </div>
 
   <!-- On-Demand Buttons -->
@@ -30,6 +29,8 @@
     <button onclick="loadAdUnits(['dynamic-banner', 'dynamic-video'])">Get All Ads</button>
     <button onclick="loadAdUnits(['dynamic-banner'])">Get Banner Ad</button>
     <button onclick="loadAdUnits(['dynamic-video'])">Get Video Ad</button>
+    <button onclick="loadAdUnits(['test-banner-div'])">Get Test Banner</button>
+    <button onclick="loadAdUnits(['test-video-div'])">Get Test Video</button>
   </div>
 
   <!-- Dynamic Banner Ad -->
@@ -44,16 +45,25 @@
     <video id="dynamic-video-player" width="640" height="360" controls style="display:none;"></video>
   </div>
 
+  <!-- Test Banner Ad -->
+  <div class="ad-container">
+    <strong>Test Banner Ad:</strong>
+    <div id="test-banner-div" style="width:320px;height:50px;border:1px solid #000;"></div>
+  </div>
+
+  <!-- Test Video Ad -->
+  <div class="ad-container">
+    <strong>Test Video Ad:</strong><br>
+    <video id="test-video-player" width="640" height="480" controls style="display:none;"></video>
+  </div>
+
   <script>
     const PUBLISHER_ID = '12345';
     const PLACEMENT_ID = '67890';
     const BID_FLOOR = 0.01;
 
-    // Static load on page render
     pbjs.que.push(function () {
-      pbjs.setConfig({ debug: true,cache: {
-      useLocal: true 
-    } });
+      pbjs.setConfig({ debug: true, cache: { useLocal: true } });
 
       const staticBannerAdUnit = {
         code: 'static-banner',
@@ -64,14 +74,19 @@
         },
         bids: [{
           bidder: 'risemediatech',
-          params: { publisherId: PUBLISHER_ID, placementId: PLACEMENT_ID, bidfloor: BID_FLOOR, mimes: ['image/jpeg', 'image/png'] }
+          params: {
+            publisherId: PUBLISHER_ID,
+            placementId: PLACEMENT_ID,
+            bidfloor: BID_FLOOR,
+            mimes: ['image/jpeg', 'image/png']
+          }
         }]
       };
 
       pbjs.addAdUnits(staticBannerAdUnit);
 
       pbjs.requestBids({
-        bidsBackHandler: function (responses) {
+        bidsBackHandler: function () {
           const bid = pbjs.getHighestCpmBids('static-banner')[0];
           if (bid?.ad) {
             document.getElementById('static-banner').innerHTML = bid.ad;
@@ -80,7 +95,6 @@
       });
     });
 
-    // Dynamic ad unit generator
     function getAdUnit(code) {
       if (code === 'dynamic-banner') {
         return {
@@ -90,7 +104,11 @@
           },
           bids: [{
             bidder: 'risemediatech',
-            params: { publisherId: PUBLISHER_ID, placementId: PLACEMENT_ID, bidfloor: BID_FLOOR }
+            params: {
+              publisherId: PUBLISHER_ID,
+              placementId: PLACEMENT_ID,
+              bidfloor: BID_FLOOR
+            }
           }]
         };
       } else if (code === 'dynamic-video') {
@@ -110,44 +128,99 @@
           },
           bids: [{
             bidder: 'risemediatech',
-            params: { publisherId: PUBLISHER_ID, placementId: PLACEMENT_ID, bidfloor: BID_FLOOR }
+            params: {
+              publisherId: PUBLISHER_ID,
+              placementId: PLACEMENT_ID,
+              bidfloor: BID_FLOOR
+            }
+          }]
+        };
+      } else if (code === 'test-banner-div') {
+        return {
+          code,
+          mediaTypes: {
+            banner: {
+              sizes: [[320, 50]]
+            }
+          },
+          bids: [{
+            bidder: 'risemediatech',
+            params: {
+              bidfloor: 0.001,
+              testMode: 1
+            }
+          }]
+        };
+      } else if (code === 'test-video-div') {
+        return {
+          code,
+          mediaTypes: {
+            video: {
+              playerSize: [640, 480],
+              context: 'instream',
+              mimes: ['video/mp4', 'video/webm'],
+              minduration: 5,
+              maxduration: 30,
+              startdelay: 30,
+              maxseq: 2,
+              poddur: 30,
+              protocols: [1, 3, 4]
+            }
+          },
+          bids: [{
+            bidder: 'risemediatech',
+            params: {
+              bidfloor: 0.001,
+              testMode: 1
+            }
           }]
         };
       }
       return null;
     }
 
-    // Load on-demand ad units
     function loadAdUnits(unitCodes = []) {
-      // Clear all previous dynamic content
-      document.getElementById('dynamic-banner').innerHTML = '';
-      const videoPlayer = document.getElementById('dynamic-video-player');
-      videoPlayer.style.display = 'none';
-      videoPlayer.pause();
-      videoPlayer.src = '';
+      // Clear previous banner content
+      ['dynamic-banner', 'test-banner-div'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+      });
+
+      // Clear and hide video players
+      const dynamicVideo = document.getElementById('dynamic-video-player');
+      dynamicVideo.pause(); dynamicVideo.src = ''; dynamicVideo.style.display = 'none';
+
+      const testVideo = document.getElementById('test-video-player');
+      testVideo.pause(); testVideo.src = ''; testVideo.style.display = 'none';
 
       const adUnits = unitCodes.map(getAdUnit).filter(Boolean);
 
       pbjs.que.push(function () {
-        // Remove and re-add the relevant ad units only
         unitCodes.forEach(code => pbjs.removeAdUnit(code));
         pbjs.addAdUnits(adUnits);
 
         pbjs.requestBids({
           adUnitCodes: unitCodes,
-          bidsBackHandler: function (responses) {
+          bidsBackHandler: function () {
             unitCodes.forEach(code => {
               const bid = pbjs.getHighestCpmBids(code)[0];
 
-              if (code === 'dynamic-banner' && bid?.ad) {
-                document.getElementById('dynamic-banner').innerHTML = bid.ad;
+              if ((code === 'dynamic-banner' || code === 'test-banner-div') && bid?.ad) {
+                document.getElementById(code).innerHTML = bid.ad;
               }
 
               if (code === 'dynamic-video' && bid?.vastUrl) {
-                videoPlayer.src = bid.vastUrl;
-                videoPlayer.style.display = 'block';
-                videoPlayer.load();
-                videoPlayer.play();
+                dynamicVideo.src = bid.vastUrl;
+                dynamicVideo.style.display = 'block';
+                dynamicVideo.load();
+                dynamicVideo.play();
+              }
+
+              if (code === 'test-video-div' && bid?.vastUrl) {
+                testVideo.src = bid.vastUrl;
+                testVideo.style.display = 'block';
+                testVideo.load();
+                testVideo.play();
               }
             });
           }
