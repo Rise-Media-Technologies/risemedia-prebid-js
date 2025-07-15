@@ -4,8 +4,8 @@ import { ortbConverter } from '../libraries/ortbConverter/converter.js';
 import { logInfo, logWarn } from '../src/utils.js';
 
 const BIDDER_CODE = 'risemediatech';
-const ENDPOINT_URL = 'https://dev-ads.risemediatech.com/ads/rtb/prebid/js';
-// const ENDPOINT_URL = 'http://54.198.179.1:8082/ads/rtb/prebid/js';
+// const ENDPOINT_URL = 'https://dev-ads.risemediatech.com/ads/rtb/prebid/js';
+const ENDPOINT_URL = 'http://54.198.179.1:8082/ads/rtb/prebid/js';
 const SYNC_URL_IFRAME = 'https://sync.risemediatech.com/iframe';
 const SYNC_URL_IMAGE = 'https://sync.risemediatech.com/image';
 const DEFAULT_CURRENCY = 'USD';
@@ -132,11 +132,6 @@ const buildRequests = (validBidRequests, bidderRequest) => {
  */
 const interpretResponse = (serverResponse, request) => {
   logInfo('Interpreting server response:', serverResponse);
-
-  if (serverResponse && serverResponse.status !== 200) {
-    logInfo(`No bids returned from the server (HTTP ${serverResponse.status}).`);
-    return [];
-  }
 
   const bidResp = serverResponse && serverResponse.body;
   if (!bidResp || !Array.isArray(bidResp.seatbid)) {
