@@ -27,7 +27,9 @@ Rise Media Technologies and PubRise are part of the same parent organization.
                     bidder: 'risemediatech',
                     params: {
                         bidfloor: 0.001,        
-                        testMode: 1
+                        testMode: 1,
+                        sspId: '',
+                        siteId: ''
                     }
                 }
             ]
@@ -58,7 +60,9 @@ Rise Media Technologies and PubRise are part of the same parent organization.
                     bidder: 'risemediatech',
                     params: {
                         bidfloor: 0.001
-                        testMode: 1
+                        testMode: 1,
+                        sspId: '',
+                        siteId: ''
                     }
                 }
             ]
