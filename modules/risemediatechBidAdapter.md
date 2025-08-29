@@ -8,6 +8,8 @@ Maintainer : prebid@risemediatech.io
 Connects to RiseMediaTech Exchange for bids
 RiseMediaTech supports Display & Video(Instream) currently.
 
+This adapter is maintained by Rise Media Technologies, the legal entity behind this implementation. Our official domain is risemediatech.io, which currently redirects to pubrise.ai for operational convenience. We also own the domain risemediatech.com.
+Rise Media Technologies and PubRise are part of the same parent organization.
 # Sample Ad Unit : Banner
 ```
     var adUnits = [
@@ -25,7 +27,9 @@ RiseMediaTech supports Display & Video(Instream) currently.
                     bidder: 'risemediatech',
                     params: {
                         bidfloor: 0.001,        
-                        testMode: 1
+                        testMode: 1,
+                        sspId: '',
+                        siteId: ''
                     }
                 }
             ]
@@ -56,7 +60,9 @@ RiseMediaTech supports Display & Video(Instream) currently.
                     bidder: 'risemediatech',
                     params: {
                         bidfloor: 0.001
-                        testMode: 1
+                        testMode: 1,
+                        sspId: '',
+                        siteId: ''
                     }
                 }
             ]

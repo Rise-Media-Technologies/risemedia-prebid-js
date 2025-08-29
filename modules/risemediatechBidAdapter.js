@@ -54,6 +54,19 @@ const converter = ortbConverter({
         request.ext.test = 1;
         logInfo('Test mode detected in bid params, setting test flag in request:', request.ext.test);
       }
+        // Add sspId and siteId if present in any bid params
+        const sspIdBid = bidderRequest.bids.find(bid => bid.params && bid.params.sspId);
+        if (sspIdBid) {
+          request.ext = request.ext || {};
+          request.ext.sspId = sspIdBid.params.sspId;
+          logInfo('sspId detected in bid params, setting sspId in request:', request.ext.sspId);
+        }
+        const siteIdBid = bidderRequest.bids.find(bid => bid.params && bid.params.siteId);
+        if (siteIdBid) {
+          request.ext = request.ext || {};
+          request.ext.siteId = siteIdBid.params.siteId;
+          logInfo('siteId detected in bid params, setting siteId in request:', request.ext.siteId);
+        }
     }
 
     if (bidderRequest.gdprConsent) {
@@ -200,7 +213,6 @@ const interpretResponse = (serverResponse, request) => {
  * @returns {Array} Array of user sync objects.
  */
 const getUserSyncs = (syncOptions, serverResponses, gdprConsent, uspConsent, gppConsent) => {
-
   // return [{ type, url }];
   logInfo('User syncs are not implemented in this adapter yet.');
   return null;

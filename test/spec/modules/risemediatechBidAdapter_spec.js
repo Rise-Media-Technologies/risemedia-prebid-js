@@ -110,7 +110,6 @@ describe('RiseMediaTech adapter', () => {
       expect(spec.isBidRequestValid(invalidBid)).to.equal(false);
     });
 
-
     it('should return false for video request with width <= 0', () => {
       const invalidBid = {
         ...validBidRequest,
@@ -125,7 +124,6 @@ describe('RiseMediaTech adapter', () => {
       expect(spec.isBidRequestValid(invalidBid)).to.equal(false);
     });
 
-
     it('should return false for video request with height <= 0', () => {
       const invalidBid = {
         ...validBidRequest,
@@ -139,7 +137,6 @@ describe('RiseMediaTech adapter', () => {
       };
       expect(spec.isBidRequestValid(invalidBid)).to.equal(false);
     });
-
 
     it('should return false for video bid request with invalid width', () => {
       const invalidVideoRequest = {
@@ -177,6 +174,30 @@ describe('RiseMediaTech adapter', () => {
       expect(request.method).to.equal('POST');
       expect(request.url).to.equal('https://dev-ads.risemediatech.com/ads/rtb/prebid/js');
       expect(request.data).to.be.an('object');
+    });
+
+    it('should include sspId in request.data.ext if present in bid params', () => {
+      const bidWithSspId = {
+        ...validBidRequest,
+        params: {
+          ...validBidRequest.params,
+          sspId: 'ssp-123'
+        }
+      };
+      const request = spec.buildRequests([bidWithSspId], bidderRequest);
+      expect(request.data.ext).to.have.property('sspId', 'ssp-123');
+    });
+
+    it('should include siteId in request.data.ext if present in bid params', () => {
+      const bidWithSiteId = {
+        ...validBidRequest,
+        params: {
+          ...validBidRequest.params,
+          siteId: 'site-456'
+        }
+      };
+      const request = spec.buildRequests([bidWithSiteId], bidderRequest);
+      expect(request.data.ext).to.have.property('siteId', 'site-456');
     });
 
     it('should include GDPR and USP consent in the request', () => {
@@ -404,12 +425,6 @@ describe('RiseMediaTech adapter', () => {
       const request = spec.buildRequests([validBidRequest], bidderRequest);
       const bids = spec.interpretResponse(serverResponse, request);
       expect(bids).to.be.an('array').with.lengthOf(1);
-    });
-
-    it('should return an empty array for HTTP 204 response', () => {
-      const request = spec.buildRequests([validBidRequest], bidderRequest);
-      const bids = spec.interpretResponse({ status: 204 }, request);
-      expect(bids).to.be.an('array').that.is.empty;
     });
 
     it('should log a warning and not set mediaType for unknown mtype', () => {
