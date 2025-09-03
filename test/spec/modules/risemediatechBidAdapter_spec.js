@@ -176,6 +176,30 @@ describe('RiseMediaTech adapter', () => {
       expect(request.data).to.be.an('object');
     });
 
+    it('should include sspId in request.data.ext if present in bid params', () => {
+      const bidWithSspId = {
+        ...validBidRequest,
+        params: {
+          ...validBidRequest.params,
+          sspId: 'ssp-123'
+        }
+      };
+      const request = spec.buildRequests([bidWithSspId], bidderRequest);
+      expect(request.data.ext).to.have.property('sspId', 'ssp-123');
+    });
+
+    it('should include siteId in request.data.ext if present in bid params', () => {
+      const bidWithSiteId = {
+        ...validBidRequest,
+        params: {
+          ...validBidRequest.params,
+          siteId: 'site-456'
+        }
+      };
+      const request = spec.buildRequests([bidWithSiteId], bidderRequest);
+      expect(request.data.ext).to.have.property('siteId', 'site-456');
+    });
+
     it('should include GDPR and USP consent in the request', () => {
       const request = spec.buildRequests([validBidRequest], bidderRequest);
       const { regs, user } = request.data;
